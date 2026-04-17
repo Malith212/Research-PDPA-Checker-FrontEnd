@@ -19,10 +19,8 @@ function App() {
         text,
       });
 
-      // ✅ FIXED HERE
       setReport(res.data.report);
       setTotalSentences(res.data.totalSentences);
-
     } catch (err) {
       console.error(err);
       alert("Error connecting to backend");
@@ -33,10 +31,7 @@ function App() {
 
   return (
     <div className="min-h-screen bg-[#0b0f1a] text-white flex items-center justify-center p-6">
-
       <div className="w-full max-w-5xl">
-
-        {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold tracking-wide">
             PDPA Compliance Checker
@@ -46,9 +41,7 @@ function App() {
           </p>
         </div>
 
-        {/* Input Card */}
         <div className="bg-[#111827] border border-gray-800 rounded-2xl shadow-2xl p-6">
-
           <textarea
             className="w-full h-64 bg-[#0b0f1a] text-gray-200 p-4 rounded-xl border border-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
             placeholder="Paste privacy policy here..."
@@ -66,9 +59,7 @@ function App() {
           </div>
         </div>
 
-        {/* Results */}
         <div className="mt-8">
-
           <h2 className="text-xl font-semibold mb-2 text-gray-300">
             📊 Analysis Report
           </h2>
@@ -83,7 +74,6 @@ function App() {
             </div>
           ) : (
             <div className="grid gap-4">
-
               {report.map((item, index) => (
                 <div
                   key={index}
@@ -93,7 +83,6 @@ function App() {
                       : "bg-green-500/10 border-green-500/40"
                   }`}
                 >
-                  {/* Section */}
                   <div className="flex justify-between items-center">
                     <span className="text-gray-200 font-medium">
                       {item.section}
@@ -110,18 +99,20 @@ function App() {
                     </span>
                   </div>
 
-                  {/* Confidence */}
-                  <p className="text-sm text-gray-400 mt-1">
+                  <p className="text-sm text-gray-400 mt-2">
                     Confidence: {item.confidence}
                   </p>
 
-                  {/* Evidence */}
+                  <p className="text-sm text-gray-400 mt-1">
+                    Detection Source:{" "}
+                    <span className="font-medium uppercase">{item.source}</span>
+                  </p>
+
                   <p className="text-sm text-gray-300 mt-2 italic">
                     “{item.evidence}”
                   </p>
                 </div>
               ))}
-
             </div>
           )}
         </div>
