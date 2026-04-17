@@ -4,75 +4,127 @@ import axios from "axios";
 function App() {
   const [text, setText] = useState("");
   const [report, setReport] = useState([]);
+  const [totalSentences, setTotalSentences] = useState(0);
   const [loading, setLoading] = useState(false);
 
   const handleAnalyze = async () => {
+    if (!text.trim()) {
+      alert("Please paste a privacy policy first");
+      return;
+    }
+
     setLoading(true);
     try {
       const res = await axios.post("http://localhost:5000/analyze", {
         text,
       });
-      setReport(res.data);
+
+      // ✅ FIXED HERE
+      setReport(res.data.report);
+      setTotalSentences(res.data.totalSentences);
+
     } catch (err) {
       console.error(err);
+      alert("Error connecting to backend");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center p-6">
-      
-      <div className="w-full max-w-4xl bg-white/10 backdrop-blur-lg rounded-2xl shadow-2xl p-8 text-white">
+    <div className="min-h-screen bg-[#0b0f1a] text-white flex items-center justify-center p-6">
 
-        {/* Title */}
-        <h1 className="text-3xl font-bold text-center mb-6">
-          🔐 PDPA Compliance Checker
-        </h1>
+      <div className="w-full max-w-5xl">
 
-        {/* Text Area */}
-        <textarea
-          className="w-full h-60 p-4 rounded-xl text-black focus:outline-none focus:ring-4 focus:ring-pink-300"
-          placeholder="Paste privacy policy here..."
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-        />
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold tracking-wide">
+            PDPA Compliance Checker
+          </h1>
+          <p className="text-gray-400 mt-2">
+            Analyze privacy policies against compliance rules
+          </p>
+        </div>
 
-        {/* Button */}
-        <div className="text-center mt-6">
-          <button
-            onClick={handleAnalyze}
-            className="px-6 py-3 bg-pink-500 hover:bg-pink-600 transition rounded-full font-semibold shadow-lg"
-          >
-            {loading ? "Analyzing..." : "Check Compliance"}
-          </button>
+        {/* Input Card */}
+        <div className="bg-[#111827] border border-gray-800 rounded-2xl shadow-2xl p-6">
+
+          <textarea
+            className="w-full h-64 bg-[#0b0f1a] text-gray-200 p-4 rounded-xl border border-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
+            placeholder="Paste privacy policy here..."
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+          />
+
+          <div className="mt-5 flex justify-end">
+            <button
+              onClick={handleAnalyze}
+              className="px-6 py-3 rounded-xl font-semibold bg-gradient-to-r from-purple-600 to-pink-500 hover:opacity-90 transition shadow-lg"
+            >
+              {loading ? "Analyzing..." : "Run Compliance Check"}
+            </button>
+          </div>
         </div>
 
         {/* Results */}
         <div className="mt-8">
-          <h2 className="text-xl font-semibold mb-4">📊 Result</h2>
+
+          <h2 className="text-xl font-semibold mb-2 text-gray-300">
+            📊 Analysis Report
+          </h2>
+
+          <p className="text-gray-500 mb-4 text-sm">
+            Total Sentences Analyzed: {totalSentences}
+          </p>
 
           {report.length === 0 ? (
-            <p className="text-white/70">No results yet...</p>
+            <div className="text-gray-500 text-center border border-gray-800 rounded-xl p-6 bg-[#111827]">
+              No analysis yet. Paste a policy and run the check.
+            </div>
           ) : (
-            <div className="space-y-3">
+            <div className="grid gap-4">
+
               {report.map((item, index) => (
                 <div
                   key={index}
-                  className={`p-4 rounded-xl shadow-md flex justify-between items-center ${
+                  className={`p-4 rounded-xl border transition ${
                     item.status.includes("❌")
-                      ? "bg-red-500/20 border border-red-300"
-                      : "bg-green-500/20 border border-green-300"
+                      ? "bg-red-500/10 border-red-500/40"
+                      : "bg-green-500/10 border-green-500/40"
                   }`}
                 >
-                  <span>{item.section}</span>
-                  <span className="font-bold">{item.status}</span>
+                  {/* Section */}
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-200 font-medium">
+                      {item.section}
+                    </span>
+
+                    <span
+                      className={`font-semibold ${
+                        item.status.includes("❌")
+                          ? "text-red-400"
+                          : "text-green-400"
+                      }`}
+                    >
+                      {item.status}
+                    </span>
+                  </div>
+
+                  {/* Confidence */}
+                  <p className="text-sm text-gray-400 mt-1">
+                    Confidence: {item.confidence}
+                  </p>
+
+                  {/* Evidence */}
+                  <p className="text-sm text-gray-300 mt-2 italic">
+                    “{item.evidence}”
+                  </p>
                 </div>
               ))}
+
             </div>
           )}
         </div>
-
       </div>
     </div>
   );
